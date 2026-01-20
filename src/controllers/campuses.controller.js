@@ -1,3 +1,5 @@
+/* eslint-disable no-unused-expressions */
+/* eslint-disable no-undef */
 const campuses = [
     { id: 1, code: "AUB", name: "Auburn Campus", city: "Auburn", open: true, programs: ["CS", "IT", "Nursing"] },
     { id: 2, code: "KCC", name: "Kent Campus", city: "Kent", open: true, programs: ["CS", "Business"] },
@@ -6,10 +8,17 @@ const campuses = [
     { id: 5, code: "REN", name: "Renton Annex", city: "Renton", open: false, programs: ["ESL", "GED"] }
 ];
 
+export const home = (req, res) => {
+    res.json({
+        campuses: campuses
+    });
+    
+}
+
 
 export const campusesAboutInfo = (req, res) => res.status(200).json({
-        message: "Campus directory routes",
-        routes: ["GET /", "GET /about|/info", "GET /:id", "GET /search?city=&open=&program="]
+        message: "server routes",
+        routes: ["GET /", "GET /about|/info", "GET /:id", "GET /search="]
     })
 
 
@@ -20,39 +29,41 @@ export const getAllCampuses = (req, res) => res.status(200).json({
 export const getCampusById = (req, res) => {
     const { id } = req.params;
 
-    const campus = campuses.find(el => el.id === Number(id))
+    console.log(id);
+
+    const campus = campuses.find(el => el.id ===Number(id))
 
     if (campus) {
-        return res.status(200).json({
-            campus: campus
-        })
+        return res.status(200).json(campus)
+            
     } else {
         return res.status(404).json({
-            error: "Campus not found"
+            message: "Campus not found"
         })
     }
 }
 
 
 export const searchCampuses = (req, res) => {
-    const { city, open, program } = req.query;
+    const { city, open, program } = req.query; 
 
     let results = campuses;
 
-    if (city) {
-        results = results.filter(el => el.city.toLowerCase() === city.toLowerCase())
+    if(program){
+        results = results.filter(el => el.programs.includes(program));
     }
 
-    if (open !== undefined) {
-        const openBool = open === "true";
-        
-        results = results.filter(el => el.open === openBool)
+    if(open){
+        results = results.filter(el => String(el.open) === open);
     }
 
-    if (program) {
-        results = results.filter(el => el.programs.includes(program))
+    if(city){
+        results = results.filter(el => el.city === city);
     }
 
+     
+
+    
     return res.status(200).json({
         results: results
     })
